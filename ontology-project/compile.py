@@ -50,6 +50,10 @@ def GetDebugJsonFilePath(contractName):
     return GetContractFilePathWithoutextention(contractName) + ".debug.json"
 
 
+def GetDeployedContractsJson():
+    return os.path.abspath(os.path.join(GetBuildFolderPath(), "DeployedContracts.json"))
+
+
 def RemoveIfExist(fileName):
     if os.path.exists(fileName):
         print("remove " + fileName)

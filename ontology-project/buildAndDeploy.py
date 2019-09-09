@@ -2,7 +2,7 @@ import os
 import sys
 import json
 from punica.invoke.invoke_contract import Invoke
-from compile import Compile, GetBuildFolderPath, GetContractsFolderPath, GetDestAbiFilePath
+from compile import Compile, GetBuildFolderPath, GetContractsFolderPath, GetDestAbiFilePath, GetDeployedContractsJson
 
 
 def BuildAndDeploy(contractName):
@@ -40,6 +40,12 @@ def DeployAllContracts():
         deployedContractsAddress[contract] = "".join(reversed(address))
     return deployedContractsAddress
 
+def WriteAddressesToFile(data):
+    with open(GetDeployedContractsJson(), 'w') as file:
+        json.dump(data, file)
+
+
 if __name__ == "__main__":
     addresses = DeployAllContracts()
-    print(addresses)
+    WriteAddressesToFile(addresses)
+    # print(addresses)
