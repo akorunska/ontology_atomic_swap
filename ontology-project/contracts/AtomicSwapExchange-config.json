@@ -6,7 +6,7 @@
       "AQvZMDecMoCi2y4V6QKdJBtHW1eV7Vbaof": "password"
     },
     "deploy": {
-      "name": "ASExchange",
+      "name": "AtomicSwapExchange",
       "version": "1.0.0",
       "author": "akorunska",
       "email": "akorunska@gmail.com",

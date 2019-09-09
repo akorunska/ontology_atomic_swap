@@ -1,0 +1,11 @@
+{
+    "CompilerVersion": "2.0.0",
+    "hash": "f8ff283ed0ac99c7667aae2ff9edf4ec511251eb",
+    "entrypoint": "Main",
+    "functions": [
+        {
+            "name": "intiate_order",
+            "parameters": []
+        }
+    ]
+}
