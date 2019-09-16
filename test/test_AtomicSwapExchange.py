@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import ASExchangeWrapper
+import AtomicSwapExchangeWrapper
 import SdkUtils
 
 
@@ -11,16 +11,16 @@ class TestCompiler(unittest.TestCase):
         hashlock = "lock"
         amountOfOntToSell = 100
         amountOfEthToBuy = 2
-        ASExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
+        AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
 
     def test_initiate_order_existing_hashlock(self):
         hashlock = "lock1"
         amountOfOntToSell = 100
         amountOfEthToBuy = 2
-        ASExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
+        AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
         SdkUtils.WaitNextBlock()
         with self.assertRaises(Exception):
-            ASExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
+            AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
 
     # def test_initiate_order_data_is_saved(self):
     #     pass

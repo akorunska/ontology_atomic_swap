@@ -1,6 +1,6 @@
 import time
 from ontology.ont_sdk import OntologySdk
-from  import SdkWrapper
+from SDKWrapper import SdkWrapper
 from ontology.smart_contract.native_contract.auth import Auth
 
 sdk = SdkWrapper.GetInstance().GetSdk()

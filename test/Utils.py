@@ -3,7 +3,7 @@ from binascii import b2a_hex
 
 
 def GetDeployedContractAddress(contractName):
-    with open('./build/DeployedContracts.json') as file:  
+    with open('./contracts/build/DeployedContracts.json') as file:  
         data = json.load(file)
         return data[contractName]
 

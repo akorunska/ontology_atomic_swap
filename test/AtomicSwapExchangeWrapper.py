@@ -8,10 +8,10 @@ from Utils import GetDeployedContractAddress, FormatOntIdParam
 
 gas_limit = 500000
 gas_price = 0
-abi_path = 'contracts/build/ASExchange_abi.json'
-contract_address = bytes.fromhex(GetDeployedContractAddress("ASExchange"))
+abi_path = './contracts/build/AtomicSwapExchange_abi.json'
+contract_address = bytes.fromhex(GetDeployedContractAddress("AtomicSwapExchange"))
 abi_info = Test.get_abi_info(abi_path)
-alice = WalletWrapper.alice
+alice = WalletWrapper.Alice()
 
 def initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock):
     preExec = False
@@ -21,7 +21,7 @@ def initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock):
         "hashlock": hashlock,
         "acct": alice,
     }
-    abiFunction = Invocation.get_function(params, 'intiate_order', abi_info)
+    abiFunction = Invoke.get_function(params, 'intiate_order', abi_info)
     return SdkUtils.SendTransaction(contract_address, alice, alice, gas_limit, gas_price, abiFunction, preExec)
 
 def get_orders():
