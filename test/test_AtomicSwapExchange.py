@@ -4,17 +4,25 @@
 import unittest
 import AtomicSwapExchangeWrapper
 import SdkUtils
+import random
+import string
+
+
+def randomString(stringLength=20):
+    """Generate a random string of fixed length """
+    letters = string.ascii_lowercase + string.ascii_uppercase
+    return ''.join(random.choice(letters) for i in range(stringLength))
 
 
 class TestCompiler(unittest.TestCase):
     def test_initiate_order_new_hashlock(self):
-        hashlock = "lock"
+        hashlock = randomString()
         amountOfOntToSell = 100
         amountOfEthToBuy = 2
         AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
 
     def test_initiate_order_existing_hashlock(self):
-        hashlock = "lock1"
+        hashlock = randomString()
         amountOfOntToSell = 100
         amountOfEthToBuy = 2
         AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
