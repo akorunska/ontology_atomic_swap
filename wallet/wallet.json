@@ -1,5 +1,22 @@
 {
-    "accounts": [{
+    "accounts": [
+    {
+        "address": "AUr5QUfeBADq6BMY6Tp5yuMsUNGpsD7nLZ",
+        "algorithm": "ECDSA",
+        "enc-alg": "aes-256-gcm",
+        "hash": "sha256",
+        "isDefault": true,
+        "key": "Q85bbTpl67SoQ07DJ1Vbx/2UPH/+dRTqIX1AN2jO0T38jseU6ef8C4DiAxAulp8P",
+        "label": "f00fda8a",
+        "lock": false,
+        "parameters": {
+            "curve": "P-256"
+        },
+        "publicKey": "03f631f975560afc7bf47902064838826ec67794ddcdbcc6f0a9c7b91fc8502583",
+        "salt": "OqeBJgNFmdPxy8uB4oP4gg==",
+        "signatureScheme": "SHA256withECDSA"
+    },
+    {
         "role": "Alice",
         "address": "AecaeSEBkt5GcBCxwz1F41TvdjX3dnKBkJ",
         "algorithm": "ECDSA",
