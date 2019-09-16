@@ -2,7 +2,7 @@ from punica.invoke.invoke_contract import Invoke
 from punica.test.test import Test
 from ontology.utils.util import parse_neo_vm_contract_return_type_integer, parse_neo_vm_contract_return_type_string, parse_neo_vm_contract_return_type_bool
 import WalletWrapper
-# import SdkUtils
+import SdkUtils
 from Utils import GetDeployedContractAddress, FormatOntIdParam
 
 
@@ -12,14 +12,15 @@ abi_path = './contracts/build/AtomicSwapExchange_abi.json'
 contract_address = bytes.fromhex(GetDeployedContractAddress("AtomicSwapExchange"))
 abi_info = Test.get_abi_info(abi_path)
 alice = WalletWrapper.Alice()
+aliceAddress = WalletWrapper.AliceAddress()
 
 def initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock):
     preExec = False
     params = {
         "amountOfOntToSell": amountOfOntToSell,
         "amountOfEthToBuy": amountOfEthToBuy,
-        "hashlock": hashlock,
-        "acct": alice,
+        "hashlock": "String:" + hashlock,
+        "acct": "ByteArray:" + aliceAddress,
     }
     abiFunction = Invoke.get_function(params, 'intiate_order', abi_info)
     return SdkUtils.SendTransaction(contract_address, alice, alice, gas_limit, gas_price, abiFunction, preExec)
