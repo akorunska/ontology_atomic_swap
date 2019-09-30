@@ -22,4 +22,6 @@ def intiate_order(ont_to_sell, eth_to_buy, hashlock):
     exchange_id = hashlock
     if len(Get(context, ConcatKey(exchange_id, HASH))) != 0:
         Revert()
+    Put(context, ConcatKey(exchange_id, HASH), hashlock)
+    
     
