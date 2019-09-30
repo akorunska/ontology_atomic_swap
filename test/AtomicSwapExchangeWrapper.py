@@ -16,12 +16,11 @@ aliceAddress = WalletWrapper.AliceAddress()
 
 def initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock):
     preExec = False
-    params = {
-        "amountOfOntToSell": amountOfOntToSell,
-        "amountOfEthToBuy": amountOfEthToBuy,
-        "hashlock": "String:" + hashlock,
-        "acct": "ByteArray:" + aliceAddress,
-    }
+    params = dict()
+    params["amountOfOntToSell"] = amountOfOntToSell
+    params["amountOfEthToBuy"] = amountOfEthToBuy
+    params["hashlock"] = "String:" + hashlock
+    # params["acct"] = "ByteArray:" + aliceAddress
     abiFunction = Invoke.get_function(params, 'intiate_order', abi_info)
     return SdkUtils.SendTransaction(contract_address, alice, alice, gas_limit, gas_price, abiFunction, preExec)
 

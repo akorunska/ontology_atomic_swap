@@ -17,12 +17,14 @@ def randomString(stringLength=20):
 class TestCompiler(unittest.TestCase):
     def test_initiate_order_new_hashlock(self):
         hashlock = randomString()
+        print(hashlock)
         amountOfOntToSell = 100
         amountOfEthToBuy = 2
         AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
 
     def test_initiate_order_existing_hashlock(self):
         hashlock = randomString()
+        print(hashlock)
         amountOfOntToSell = 100
         amountOfEthToBuy = 2
         AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
