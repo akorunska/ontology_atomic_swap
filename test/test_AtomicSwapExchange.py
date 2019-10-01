@@ -12,8 +12,7 @@ from datetime import datetime
 def randomString(stringLength=20):
     """Generate a random string of fixed length """
     letters = string.ascii_lowercase + string.ascii_uppercase
-    random.seed(datetime.now())
-    return ''.join(random.choice(letters) for i in range(stringLength))
+    return str(datetime.now()) + ''.join(random.choice(letters) for i in range(stringLength))
 
 
 class TestCompiler(unittest.TestCase):
