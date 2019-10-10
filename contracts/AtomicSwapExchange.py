@@ -1,7 +1,7 @@
 # from ontology.interop.System.Runtime import GetTime, CheckWitness, Log, Notify, Serialize, Deserialize
 from ontology.interop.System.Storage import Put, Get, GetContext
 from ontology.builtins import *
-from LibUtils.ContractUtils import ConcatKey, Revert
+from LibUtils.ContractUtils import ConcatKey, Revert, Require
 
 context = GetContext()
 
@@ -36,10 +36,10 @@ def intiate_order(ont_to_sell, eth_to_buy, hashlock):
     Put(context, ConcatKey(order_id, ONT_TO_SELL), ont_to_sell)
 
 def get_amount_of_ont_to_sell(order_id):
-    return Get(context, ConcatKey(order_id, ETH_TO_BUY))
+    return Get(context, ConcatKey(order_id, ONT_TO_SELL))
 
 def get_amount_of_eth_to_buy(order_id):
-    return Get(context, ConcatKey(order_id, ONT_TO_SELL))
+    return Get(context, ConcatKey(order_id, ETH_TO_BUY))
 
 def get_hashlock(order_id):
     return Get(context, ConcatKey(order_id, HASH))
