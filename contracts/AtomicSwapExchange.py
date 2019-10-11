@@ -1,7 +1,7 @@
 # from ontology.interop.System.Runtime import GetTime, CheckWitness, Log, Notify, Serialize, Deserialize
 from ontology.interop.System.Storage import Put, Get, GetContext
 from ontology.builtins import *
-from LibUtils.ContractUtils import ConcatKey, Revert, Require
+from LibUtils.ContractUtils import ConcatKey, Revert, Require, WitnessRequire
 
 context = GetContext()
 
@@ -15,7 +15,8 @@ def Main(operation, args):
         ont_to_sell = args[0]
         eth_to_buy = args[1]
         hashlock = args[2]
-        return intiate_order(ont_to_sell, eth_to_buy, hashlock)
+        initiator = args[3]
+        return intiate_order(ont_to_sell, eth_to_buy, hashlock, initiator)
     if operation == 'get_amount_of_ont_to_sell':
         hashlock = args[0]
         return get_amount_of_ont_to_sell(hashlock)
@@ -27,7 +28,8 @@ def Main(operation, args):
         return get_hashlock(hashlock)
 
 
-def intiate_order(ont_to_sell, eth_to_buy, hashlock):
+def intiate_order(ont_to_sell, eth_to_buy, hashlock, initiator):
+    WitnessRequire(initiator)
     order_id = hashlock
     if len(Get(context, ConcatKey(order_id, HASH))) != 0:
         Revert()

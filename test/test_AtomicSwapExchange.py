@@ -3,6 +3,7 @@
 
 import unittest
 import AtomicSwapExchangeWrapper
+import WalletWrapper
 import SdkUtils
 import random
 import string
@@ -24,6 +25,13 @@ class TestCompiler(unittest.TestCase):
             AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
         except Exception as e:
             self.fail(e)
+
+    def test_initiate_order_as_other_user(self):
+        hashlock = randomString()
+        amountOfOntToSell = 100
+        amountOfEthToBuy = 2
+        with self.assertRaises(Exception):
+            AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock, initiator=WalletWrapper.BobAddress())
 
     def test_initiate_order_existing_hashlock(self):
         hashlock = randomString()

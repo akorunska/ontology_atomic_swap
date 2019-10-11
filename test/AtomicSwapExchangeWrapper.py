@@ -14,13 +14,13 @@ abi_info = Test.get_abi_info(abi_path)
 alice = WalletWrapper.Alice()
 aliceAddress = WalletWrapper.AliceAddress()
 
-def initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock):
+def initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock, initiator=aliceAddress):
     preExec = False
     params = dict()
     params["amountOfOntToSell"] = amountOfOntToSell
     params["amountOfEthToBuy"] = amountOfEthToBuy
     params["hashlock"] = "String:" + hashlock
-    # params["acct"] = "ByteArray:" + aliceAddress
+    params["initiator"] = "ByteArray:" + initiator
     abiFunction = Invoke.get_function(params, 'intiate_order', abi_info)
     return SdkUtils.SendTransaction(contract_address, alice, alice, gas_limit, gas_price, abiFunction, preExec)
 
