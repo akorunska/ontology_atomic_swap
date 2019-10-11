@@ -8,6 +8,7 @@ context = GetContext()
 HASH = 'Hash'
 ONT_TO_SELL =  'OntToSell'
 ETH_TO_BUY = 'EthToBuy'
+INITIATOR = "Initiator"
 
 
 def Main(operation, args):
@@ -26,6 +27,9 @@ def Main(operation, args):
     if operation == 'get_hashlock':
         hashlock = args[0]
         return get_hashlock(hashlock)
+    if operation == 'get_initiator':
+        hashlock = args[0]
+        return get_initiator(hashlock)
 
 
 def intiate_order(ont_to_sell, eth_to_buy, hashlock, initiator):
@@ -36,6 +40,7 @@ def intiate_order(ont_to_sell, eth_to_buy, hashlock, initiator):
     Put(context, ConcatKey(order_id, HASH), hashlock)
     Put(context, ConcatKey(order_id, ETH_TO_BUY), eth_to_buy)
     Put(context, ConcatKey(order_id, ONT_TO_SELL), ont_to_sell)
+    Put(context, ConcatKey(order_id, INITIATOR), initiator)
 
 def get_amount_of_ont_to_sell(order_id):
     return Get(context, ConcatKey(order_id, ONT_TO_SELL))
@@ -45,5 +50,8 @@ def get_amount_of_eth_to_buy(order_id):
 
 def get_hashlock(order_id):
     return Get(context, ConcatKey(order_id, HASH))
+
+def get_initiator(order_id):
+    return Get(context, ConcatKey(order_id, INITIATOR))
     
     

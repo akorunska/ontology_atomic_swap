@@ -1,6 +1,6 @@
 from punica.invoke.invoke_contract import Invoke
 from punica.test.test import Test
-from ontology.utils.util import parse_neo_vm_contract_return_type_integer, parse_neo_vm_contract_return_type_string
+from ontology.utils.util import parse_neo_vm_contract_return_type_integer, parse_neo_vm_contract_return_type_string, parse_neo_vm_contract_return_type_bytearray
 import WalletWrapper
 import SdkUtils
 from Utils import GetDeployedContractAddress, FormatOntIdParam
@@ -47,6 +47,14 @@ def get_hashlock(hashlock):
     abiFunction = Invoke.get_function(params, 'get_hashlock', abi_info)
     responce = SdkUtils.SendTransaction(contract_address, alice, alice, gas_limit, gas_price, abiFunction, preExec)
     return parse_neo_vm_contract_return_type_string(responce)
+
+def get_initiator(hashlock):
+    preExec = True
+    params = dict()
+    params["order_id"] = "String:" + hashlock
+    abiFunction = Invoke.get_function(params, 'get_initiator', abi_info)
+    responce = SdkUtils.SendTransaction(contract_address, alice, alice, gas_limit, gas_price, abiFunction, preExec)
+    return responce
 
 # def get_orders():
 #     preExec = True
