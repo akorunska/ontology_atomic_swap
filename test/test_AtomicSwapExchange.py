@@ -43,10 +43,10 @@ class TestCompiler(unittest.TestCase):
         AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
         savedAmountOfOntToSell = AtomicSwapExchangeWrapper.get_amount_of_ont_to_sell(hashlock)
         savedAmountOfEthToBuy = AtomicSwapExchangeWrapper.get_amount_of_eth_to_buy(hashlock)
-        print(savedAmountOfOntToSell)
-        print(savedAmountOfEthToBuy)
+        savedHashlock = AtomicSwapExchangeWrapper.get_hashlock(hashlock)
         self.assertEqual(savedAmountOfOntToSell, amountOfOntToSell)
         self.assertEqual(savedAmountOfEthToBuy, amountOfEthToBuy)
+        self.assertEqual(savedHashlock, hashlock)
 
 
 if __name__ == '__main__':

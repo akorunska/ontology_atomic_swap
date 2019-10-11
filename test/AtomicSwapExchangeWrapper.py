@@ -44,7 +44,7 @@ def get_hashlock(hashlock):
     preExec = True
     params = dict()
     params["order_id"] = "String:" + hashlock
-    abiFunction = Invoke.get_function(params, 'hashlock', abi_info)
+    abiFunction = Invoke.get_function(params, 'get_hashlock', abi_info)
     responce = SdkUtils.SendTransaction(contract_address, alice, alice, gas_limit, gas_price, abiFunction, preExec)
     return parse_neo_vm_contract_return_type_string(responce)
 
