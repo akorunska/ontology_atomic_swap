@@ -1,7 +1,8 @@
-# from ontology.interop.System.Runtime import GetTime, CheckWitness, Log, Notify, Serialize, Deserialize
+# from ontology.interop.System.Runtime import Deserialize
 from ontology.interop.System.Storage import Put, Get, GetContext
 from ontology.builtins import *
 from LibUtils.ContractUtils import ConcatKey, Revert, Require, WitnessRequire
+from boa.interop.System.Runtime import  Serialize
 
 context = GetContext()
 
@@ -9,6 +10,7 @@ HASH = 'Hash'
 ONT_TO_SELL =  'OntToSell'
 ETH_TO_BUY = 'EthToBuy'
 INITIATOR = "Initiator"
+CLAIMED = "Claimed"
 
 
 def Main(operation, args):
@@ -30,6 +32,10 @@ def Main(operation, args):
     if operation == 'get_initiator':
         hashlock = args[0]
         return get_initiator(hashlock)
+    if operation == 'claim':
+        hashlock = args[0]
+        secret = args[1]
+        return claim(hashlock, secret)
 
 
 def intiate_order(ont_to_sell, eth_to_buy, hashlock, initiator):
@@ -41,6 +47,7 @@ def intiate_order(ont_to_sell, eth_to_buy, hashlock, initiator):
     Put(context, ConcatKey(order_id, ETH_TO_BUY), eth_to_buy)
     Put(context, ConcatKey(order_id, ONT_TO_SELL), ont_to_sell)
     Put(context, ConcatKey(order_id, INITIATOR), initiator)
+    Put(context, ConcatKey(order_id, CLAIMED), False)
 
 def get_amount_of_ont_to_sell(order_id):
     return Get(context, ConcatKey(order_id, ONT_TO_SELL))
@@ -53,5 +60,17 @@ def get_hashlock(order_id):
 
 def get_initiator(order_id):
     return Get(context, ConcatKey(order_id, INITIATOR))
+    
+def claim(order_id, secret):
+    if Get(context, ConcatKey(order_id, CLAIMED)) == True:
+        Revert()
+    hashlock = Get(context, ConcatKey(order_id, HASH))
+    # todo check if the claimer is the person whose address was specified by the initiator
+    if sha256(secret) != order_id:
+        Revert()
+    Put(context, ConcatKey(order_id, CLAIMED), True)
+    # todo replace return True with sending according amount of ont
+    return True
+
     
     
