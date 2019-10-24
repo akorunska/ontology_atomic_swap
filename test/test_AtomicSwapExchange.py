@@ -85,32 +85,32 @@ class TestCompiler(unittest.TestCase):
         print(claimResult)
         # self.assertTrue(claimResult)
 
-    # def test_claim_correct_hashlock_claim_twice(self):
-    #     secret = randomString()
-    #     hashlock = getHashlock(getHashlock(secret))
-    #     print(hashlock)
-    #     amountOfOntToSell = 100
-    #     amountOfEthToBuy = 2
+    def test_claim_correct_hashlock_claim_twice(self):
+        secret = randomString()
+        hashlock = getHashlock(getHashlock(secret))
+        print(hashlock)
+        amountOfOntToSell = 100
+        amountOfEthToBuy = 2
 
-    #     AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
-    #     SdkUtils.WaitNextBlock()
-    #     claimResult = AtomicSwapExchangeWrapper.claim(hashlock, secret)
-    #     self.assertTrue(claimResult)
-    #     with self.assertRaises(Exception):
-    #         AtomicSwapExchangeWrapper.claim(hashlock, secret)
+        AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
+        SdkUtils.WaitNextBlock()
+        claimResult = AtomicSwapExchangeWrapper.claim(hashlock, secret)
+        self.assertTrue(claimResult)
+        with self.assertRaises(Exception):
+            AtomicSwapExchangeWrapper.claim(hashlock, secret)
 
 
-    # def test_claim_wrong_secret(self):
-    #     secret = randomString()
-    #     hashlock = getHashlock(getHashlock(secret)) + "blah"
-    #     print(hashlock)
-    #     amountOfOntToSell = 100
-    #     amountOfEthToBuy = 2
+    def test_claim_wrong_secret(self):
+        secret = randomString()
+        hashlock = getHashlock(getHashlock(secret)) + "blah"
+        print(hashlock)
+        amountOfOntToSell = 100
+        amountOfEthToBuy = 2
 
-    #     AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
-    #     SdkUtils.WaitNextBlock()
-    #     with self.assertRaises(Exception):
-    #         AtomicSwapExchangeWrapper.claim(hashlock, secret)
+        AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
+        SdkUtils.WaitNextBlock()
+        with self.assertRaises(Exception):
+            AtomicSwapExchangeWrapper.claim(hashlock, secret)
 
 
 if __name__ == '__main__':
