@@ -4,6 +4,7 @@ from ontology.utils.util import parse_neo_vm_contract_return_type_integer, parse
 import WalletWrapper
 import SdkUtils
 from Utils import GetDeployedContractAddress, FormatOntIdParam
+import codecs
 
 
 gas_limit = SdkUtils.g_gasLimit
@@ -14,12 +15,15 @@ abi_info = Test.get_abi_info(abi_path)
 alice = WalletWrapper.Alice()
 aliceAddress = WalletWrapper.AliceAddress()
 
+def to_hex(str_to_convert):
+    return codecs.encode(bytes(str_to_convert, 'utf-8'), 'hex').decode('ascii')
+
 def initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock, initiator=aliceAddress):
     preExec = False
     params = dict()
     params["amountOfOntToSell"] = amountOfOntToSell
     params["amountOfEthToBuy"] = amountOfEthToBuy
-    params["hashlock"] = "String:" + hashlock
+    params["hashlock"] = "Hex:" + hashlock.hex()
     params["initiator"] = "ByteArray:" + initiator
     abiFunction = Invoke.get_function(params, 'intiate_order', abi_info)
     return SdkUtils.SendTransaction(contract_address, alice, alice, gas_limit, gas_price, abiFunction, preExec)
@@ -27,7 +31,8 @@ def initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock, initiator=alic
 def get_amount_of_ont_to_sell(hashlock):
     preExec = True
     params = dict()
-    params["order_id"] = "String:" + hashlock
+    params["order_id"] = "Hex:" + hashlock.hex()
+
     abiFunction = Invoke.get_function(params, 'get_amount_of_ont_to_sell', abi_info)
     responce = SdkUtils.SendTransaction(contract_address, alice, alice, gas_limit, gas_price, abiFunction, preExec)
     return parse_neo_vm_contract_return_type_integer(responce)
@@ -35,7 +40,8 @@ def get_amount_of_ont_to_sell(hashlock):
 def get_amount_of_eth_to_buy(hashlock):
     preExec = True
     params = dict()
-    params["order_id"] = "String:" + hashlock
+    params["order_id"] = "Hex:" + hashlock.hex()
+
     abiFunction = Invoke.get_function(params, 'get_amount_of_eth_to_buy', abi_info)
     responce = SdkUtils.SendTransaction(contract_address, alice, alice, gas_limit, gas_price, abiFunction, preExec)
     return parse_neo_vm_contract_return_type_integer(responce)
@@ -43,31 +49,26 @@ def get_amount_of_eth_to_buy(hashlock):
 def get_hashlock(hashlock):
     preExec = True
     params = dict()
-    params["order_id"] = "String:" + hashlock
+    params["order_id"] = "Hex:" + hashlock.hex()
+
     abiFunction = Invoke.get_function(params, 'get_hashlock', abi_info)
     responce = SdkUtils.SendTransaction(contract_address, alice, alice, gas_limit, gas_price, abiFunction, preExec)
-    return parse_neo_vm_contract_return_type_string(responce)
+    return bytes(parse_neo_vm_contract_return_type_string(responce), 'utf-8')
 
 def get_initiator(hashlock):
     preExec = True
     params = dict()
-    params["order_id"] = "String:" + hashlock
+    params["order_id"] = "Hex:" + hashlock.hex()
+
     abiFunction = Invoke.get_function(params, 'get_initiator', abi_info)
     responce = SdkUtils.SendTransaction(contract_address, alice, alice, gas_limit, gas_price, abiFunction, preExec)
     return responce
 
-def get_hash():
-    preExec = True
-    params = dict()
-    abiFunction = Invoke.get_function(params, 'get_hash', abi_info)
-    responce = SdkUtils.SendTransaction(contract_address, alice, alice, gas_limit, gas_price, abiFunction, preExec)
-    return responce
-
 def claim(hashlock, secret):
-    preExec = True
+    preExec = False
     params = dict()
-    params["order_id"] = "String:" + hashlock
-    params["secret"] = "String:" + secret
+    params["order_id"] = "Hex:" + hashlock.hex()
+    params["secret"] = "Hex:" + secret.hex()
     abiFunction = Invoke.get_function(params, 'claim', abi_info)
     responce = SdkUtils.SendTransaction(contract_address, alice, alice, gas_limit, gas_price, abiFunction, preExec)
     return responce

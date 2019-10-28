@@ -62,15 +62,15 @@ def get_initiator(order_id):
     return Get(context, ConcatKey(order_id, INITIATOR))
     
 def claim(order_id, secret):
-    if Get(context, ConcatKey(order_id, CLAIMED)) == True:
+    claimed = Get(context, ConcatKey(order_id, CLAIMED))
+    if claimed == True:
         Revert()
-    hashlock = Get(context, ConcatKey(order_id, HASH))
+    hashlock = Get(context, ConcatKey(sha256(secret), HASH))
     # todo check if the claimer is the person whose address was specified by the initiator
-    if sha256(secret) != order_id:
+    if order_id != hashlock:
         Revert()
     Put(context, ConcatKey(order_id, CLAIMED), True)
-    # todo replace return True with sending according amount of ont
-    return True
+    # todo add sending ont according amount of ont in the order
 
     
     
