@@ -74,8 +74,8 @@ def get_buyer(hashlock):
     responce = SdkUtils.SendTransaction(contract_address, alice, payer, gas_limit, gas_price, abiFunction, preExec)
     return responce
 
-def set_buyer_address(hashlock, buyer, sender=alice):
-    preExec = False
+def set_buyer_address(hashlock, buyer, sender):
+    preExec = True
     params = dict()
     params["order_id"] = "Hex:" + hashlock.hex()
     params["buyer"] = "ByteArray:" + buyer

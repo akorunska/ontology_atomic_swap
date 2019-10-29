@@ -72,8 +72,12 @@ def get_hashlock(order_id):
 def get_initiator(order_id):
     return Get(context, ConcatKey(order_id, INITIATOR))
 
-def set_buyer_address(hashlock, buyer):
-    pass
+def set_buyer_address(order_id, buyer):
+    saved_initiator = Get(context, ConcatKey(order_id, INITIATOR))
+    WitnessRequire(saved_initiator)
+
+    Put(context, ConcatKey(order_id, BUYER), buyer)
+    # todo set timelock for the refund 
 
 def get_buyer(order_id):
     return Get(context, ConcatKey(order_id, BUYER))
