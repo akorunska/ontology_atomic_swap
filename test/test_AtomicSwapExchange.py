@@ -13,6 +13,12 @@ import hashlib
 
 addr = Address(bytes.fromhex('8f651d459b4f146380dab28e7cfb9d4bb9c3fcd1'))
 
+alice = WalletWrapper.Alice()
+aliceAddress = WalletWrapper.AliceAddress()
+bob = WalletWrapper.Bob()
+bobAddress = WalletWrapper.BobAddress()
+eve = WalletWrapper.Eve()
+eveAddress = WalletWrapper.EveAddress
 
 def randomSecret(stringLength=20):
     """Generate a random string of fixed length """
@@ -40,7 +46,7 @@ class TestCompiler(unittest.TestCase):
         amountOfOntToSell = 100
         amountOfEthToBuy = 2
         with self.assertRaises(Exception):
-            AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock, initiator=WalletWrapper.BobAddress())
+            AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock, initiator=bobAddress)
 
     def test_initiate_order_existing_hashlock(self):
         hashlock = randomSecret()
@@ -57,7 +63,7 @@ class TestCompiler(unittest.TestCase):
         hashlock = randomSecret()
         amountOfOntToSell = 100
         amountOfEthToBuy = 2
-        initiator = WalletWrapper.AliceAddress()
+        initiator = aliceAddress
         AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
         savedAmountOfOntToSell = AtomicSwapExchangeWrapper.get_amount_of_ont_to_sell(hashlock)
         savedAmountOfEthToBuy = AtomicSwapExchangeWrapper.get_amount_of_eth_to_buy(hashlock)
@@ -70,6 +76,53 @@ class TestCompiler(unittest.TestCase):
         self.assertEqual(savedAmountOfEthToBuy, amountOfEthToBuy)
         self.assertEqual(savedHashlock, hashlock)
         self.assertEqual(savedInitiator, initiator)
+
+    def test_set_buyer_address_as_initiator(self):
+        secret = randomSecret()
+        hashlock = getHashlock(secret)
+        amountOfOntToSell = 100
+        amountOfEthToBuy = 2
+
+        AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock, sender=alice)
+        SdkUtils.WaitNextBlock()
+        buyerAddress = bobAddress
+        txHash = AtomicSwapExchangeWrapper.set_buyer_address(hashlock, buyerAddress, sender=alice)
+        self.assertTrue(len(txHash))
+        
+        savedAddress = Address(bytes.fromhex(AtomicSwapExchangeWrapper.get_buyer(hashlock)))
+        savedBuyer = savedAddress.b58encode()
+        self.assertEqual(savedBuyer, buyerAddress)
+
+    def test_set_buyer_address_as_buyer(self):
+        secret = randomSecret()
+        hashlock = getHashlock(secret)
+        amountOfOntToSell = 100
+        amountOfEthToBuy = 2
+
+        AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock, sender=alice)
+        SdkUtils.WaitNextBlock()
+        buyerAddress = bobAddress
+        with self.assertRaises(Exception):
+            AtomicSwapExchangeWrapper.set_buyer_address(hashlock, buyerAddress, sender=bob)
+        
+        savedAddress = Address(bytes.fromhex(AtomicSwapExchangeWrapper.get_buyer(hashlock)))
+        savedBuyer = savedAddress.b58encode()
+        self.assertNotEqual(savedBuyer, buyerAddress)
+
+    def test_set_buyer_address_as_random_user(self):
+        secret = randomSecret()
+        hashlock = getHashlock(secret)
+        amountOfOntToSell = 100
+        amountOfEthToBuy = 2
+
+        AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock, sender=alice)
+        SdkUtils.WaitNextBlock()
+        buyerAddress = bobAddress
+        with self.assertRaises(Exception):
+            AtomicSwapExchangeWrapper.set_buyer_address(hashlock, buyerAddress, sender=eve)
+        savedAddress = Address(bytes.fromhex(AtomicSwapExchangeWrapper.get_buyer(hashlock)))
+        savedBuyer = savedAddress.b58encode()
+        self.assertNotEqual(savedBuyer, buyerAddress)
 
     def test_claim_correct_hashlock(self):
         secret = randomSecret()
@@ -108,6 +161,12 @@ class TestCompiler(unittest.TestCase):
         SdkUtils.WaitNextBlock()
         with self.assertRaises(Exception):
             AtomicSwapExchangeWrapper.claim(hashlock, secret)
+
+    def test_claim_buyer_not_set(self):
+        self.assertTrue(False)
+
+    def test_claim_wrong_buyer_address(self):
+        self.assertTrue(False)
 
 
 if __name__ == '__main__':

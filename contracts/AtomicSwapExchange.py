@@ -11,6 +11,7 @@ ONT_TO_SELL =  'OntToSell'
 ETH_TO_BUY = 'EthToBuy'
 INITIATOR = "Initiator"
 CLAIMED = "Claimed"
+BUYER = "Buyer"
 
 
 def Main(operation, args):
@@ -32,6 +33,16 @@ def Main(operation, args):
     if operation == 'get_initiator':
         hashlock = args[0]
         return get_initiator(hashlock)
+    if operation == 'set_buyer_address':
+        hashlock = args[0]
+        buyer = args[1]
+        return set_buyer_address(hashlock, buyer)
+    if operation == 'get_buyer':
+        hashlock = args[0]
+        return get_buyer(hashlock)
+    if operation == 'refund':
+        hashlock = args[0]
+        return refund(hashlock)
     if operation == 'claim':
         hashlock = args[0]
         secret = args[1]
@@ -60,6 +71,15 @@ def get_hashlock(order_id):
 
 def get_initiator(order_id):
     return Get(context, ConcatKey(order_id, INITIATOR))
+
+def set_buyer_address(hashlock, buyer):
+    pass
+
+def get_buyer(order_id):
+    return Get(context, ConcatKey(order_id, BUYER))
+
+def refund(hashlock):
+    pass
     
 def claim(order_id, secret):
     claimed = Get(context, ConcatKey(order_id, CLAIMED))
