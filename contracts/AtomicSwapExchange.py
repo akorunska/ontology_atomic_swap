@@ -89,10 +89,14 @@ def claim(order_id, secret):
     claimed = Get(context, ConcatKey(order_id, CLAIMED))
     if claimed == True:
         Revert()
+
     hashlock = Get(context, ConcatKey(sha256(secret), HASH))
-    # todo check if the claimer is the person whose address was specified by the initiator
     if order_id != hashlock:
         Revert()
+
+    saved_buyer = Get(context, ConcatKey(order_id, BUYER))
+    WitnessRequire(saved_buyer)
+
     Put(context, ConcatKey(order_id, CLAIMED), True)
     # todo add sending ont according amount of ont in the order
 

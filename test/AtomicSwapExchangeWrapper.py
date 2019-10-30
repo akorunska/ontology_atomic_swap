@@ -75,12 +75,12 @@ def get_buyer(hashlock):
     return responce
 
 def set_buyer_address(hashlock, buyer, sender):
-    preExec = True
+    preExec = False
     params = dict()
     params["order_id"] = "Hex:" + hashlock.hex()
     params["buyer"] = "ByteArray:" + buyer
     abiFunction = Invoke.get_function(params, 'set_buyer_address', abi_info)
-    responce = SdkUtils.SendTransaction(contract_address, sender, payer, gas_limit, gas_price, abiFunction, preExec)
+    responce = SdkUtils.SendTransaction(contract_address, sender, sender, gas_limit, gas_price, abiFunction, preExec)
     return responce
 
 def refund(hashlock, sender=alice):
@@ -88,7 +88,7 @@ def refund(hashlock, sender=alice):
     params = dict()
     params["order_id"] = "Hex:" + hashlock.hex()
     abiFunction = Invoke.get_function(params, 'refund', abi_info)
-    responce = SdkUtils.SendTransaction(contract_address, sender, payer, gas_limit, gas_price, abiFunction, preExec)
+    responce = SdkUtils.SendTransaction(contract_address, sender, sender, gas_limit, gas_price, abiFunction, preExec)
     return responce
 
 def claim(hashlock, secret, sender=alice):
@@ -97,7 +97,7 @@ def claim(hashlock, secret, sender=alice):
     params["order_id"] = "Hex:" + hashlock.hex()
     params["secret"] = "Hex:" + secret.hex()
     abiFunction = Invoke.get_function(params, 'claim', abi_info)
-    responce = SdkUtils.SendTransaction(contract_address, sender, payer, gas_limit, gas_price, abiFunction, preExec)
+    responce = SdkUtils.SendTransaction(contract_address, sender, sender, gas_limit, gas_price, abiFunction, preExec)
     return responce
 
 
