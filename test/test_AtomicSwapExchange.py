@@ -13,6 +13,8 @@ import hashlib
 
 addr = Address(bytes.fromhex('8f651d459b4f146380dab28e7cfb9d4bb9c3fcd1'))
 
+refundTimelockDuration = 20
+
 alice = WalletWrapper.Alice()
 aliceAddress = WalletWrapper.AliceAddress()
 bob = WalletWrapper.Bob()
@@ -105,8 +107,6 @@ class TestCompiler(unittest.TestCase):
         savedAddress = Address(bytes.fromhex(AtomicSwapExchangeWrapper.get_initiator(hashlock)))
         savedInitiator = savedAddress.b58encode()
         buyerAddress = WalletWrapper.BobAddress()
-        print("initiator: ", savedInitiator)
-        print("buyer: ", buyerAddress)
         with self.assertRaises(Exception):
             tx = AtomicSwapExchangeWrapper.set_buyer_address(hashlock, buyer=buyerAddress, sender=bob)
         
@@ -220,6 +220,61 @@ class TestCompiler(unittest.TestCase):
         with self.assertRaises(Exception):
             # a random user cannot claim coins
             AtomicSwapExchangeWrapper.claim(hashlock, secret, sender=eve)
+
+    def test_refund_for_initiator_after_locktime(self):
+        secret = randomSecret()
+        hashlock = getHashlock(secret)
+        amountOfOntToSell = 100
+        amountOfEthToBuy = 2
+
+        AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
+        SdkUtils.WaitNextBlock()
+        buyerAddress = bobAddress
+        AtomicSwapExchangeWrapper.set_buyer_address(hashlock, buyerAddress, sender=alice)
+        time.sleep(refundTimelockDuration)
+        txHash = AtomicSwapExchangeWrapper.refund(hashlock, secret, sender=alice)
+        self.assertTrue(len(txHash))
+
+    def test_refund_for_initiator_before_locktime(self):
+        secret = randomSecret()
+        hashlock = getHashlock(secret)
+        amountOfOntToSell = 100
+        amountOfEthToBuy = 2
+
+        AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
+        SdkUtils.WaitNextBlock()
+        buyerAddress = bobAddress
+        AtomicSwapExchangeWrapper.set_buyer_address(hashlock, buyerAddress, sender=alice)
+        with self.assertRaises(Exception):
+            AtomicSwapExchangeWrapper.refund(hashlock, secret, sender=alice)
+    
+    def test_refund_for_buyer(self):
+        secret = randomSecret()
+        hashlock = getHashlock(secret)
+        amountOfOntToSell = 100
+        amountOfEthToBuy = 2
+
+        AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
+        SdkUtils.WaitNextBlock()
+        buyerAddress = bobAddress
+        AtomicSwapExchangeWrapper.set_buyer_address(hashlock, buyerAddress, sender=alice)
+        time.sleep(refundTimelockDuration)
+        with self.assertRaises(Exception):
+            AtomicSwapExchangeWrapper.refund(hashlock, secret, sender=bob)
+
+    def test_refund_for_random_user(self):
+        secret = randomSecret()
+        hashlock = getHashlock(secret)
+        amountOfOntToSell = 100
+        amountOfEthToBuy = 2
+
+        AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
+        SdkUtils.WaitNextBlock()
+        buyerAddress = bobAddress
+        AtomicSwapExchangeWrapper.set_buyer_address(hashlock, buyerAddress, sender=alice)
+        time.sleep(refundTimelockDuration)
+        with self.assertRaises(Exception):
+            AtomicSwapExchangeWrapper.refund(hashlock, secret, sender=eve)
 
 if __name__ == '__main__':
     unittest.main()
