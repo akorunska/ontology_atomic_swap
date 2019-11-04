@@ -2,7 +2,7 @@
 from ontology.interop.System.Storage import Put, Get, GetContext
 from ontology.builtins import *
 from LibUtils.ContractUtils import ConcatKey, Revert, Require, WitnessRequire
-from boa.interop.System.Runtime import  Serialize
+from boa.interop.System.Runtime import  GetTime
 
 context = GetContext()
 
@@ -12,7 +12,9 @@ ETH_TO_BUY = 'EthToBuy'
 INITIATOR = "Initiator"
 CLAIMED = "Claimed"
 BUYER = "Buyer"
+REFUND_TIMELOCK = "RefundTimelock"
 
+REFUND_TIMELOCK_DURATION = 20
 
 def Main(operation, args):
     if operation == 'intiate_order':
@@ -40,6 +42,9 @@ def Main(operation, args):
     if operation == 'get_buyer':
         hashlock = args[0]
         return get_buyer(hashlock)
+    if operation == 'get_refund_timelock':
+        hashlock = args[0]
+        return get_refund_timelock(hashlock)
     if operation == 'refund':
         hashlock = args[0]
         return refund(hashlock)
@@ -77,10 +82,15 @@ def set_buyer_address(order_id, buyer):
     WitnessRequire(saved_initiator)
 
     Put(context, ConcatKey(order_id, BUYER), buyer)
-    # todo set timelock for the refund 
+    timelock = GetTime() + REFUND_TIMELOCK_DURATION
+    Put(context, ConcatKey(order_id, REFUND_TIMELOCK), timelock) 
 
 def get_buyer(order_id):
     return Get(context, ConcatKey(order_id, BUYER))
+
+def get_refund_timelock(order_id):
+    timelock = Get(context, ConcatKey(order_id, REFUND_TIMELOCK))
+    return timelock if timelock is not None else 0
 
 def refund(hashlock):
     pass

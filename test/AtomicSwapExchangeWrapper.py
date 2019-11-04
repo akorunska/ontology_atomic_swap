@@ -74,6 +74,15 @@ def get_buyer(hashlock):
     responce = SdkUtils.SendTransaction(contract_address, alice, payer, gas_limit, gas_price, abiFunction, preExec)
     return responce
 
+def get_refund_timelock(hashlock):
+    preExec = True
+    params = dict()
+    params["order_id"] = "Hex:" + hashlock.hex()
+
+    abiFunction = Invoke.get_function(params, 'get_refund_timelock', abi_info)
+    responce = SdkUtils.SendTransaction(contract_address, alice, payer, gas_limit, gas_price, abiFunction, preExec)
+    return parse_neo_vm_contract_return_type_integer(responce)
+
 def set_buyer_address(hashlock, buyer, sender):
     preExec = False
     params = dict()

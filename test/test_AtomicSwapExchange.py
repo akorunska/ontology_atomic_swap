@@ -129,6 +129,22 @@ class TestCompiler(unittest.TestCase):
         savedBuyer = savedAddress.b58encode()
         self.assertNotEqual(savedBuyer, buyerAddress)
 
+    def test_set_buyer_address_refund_timelock_is_set(self):
+        secret = randomSecret()
+        hashlock = getHashlock(secret)
+        amountOfOntToSell = 100
+        amountOfEthToBuy = 2
+
+        AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock, sender=alice)
+        SdkUtils.WaitNextBlock()
+        buyerAddress = bobAddress
+        refundTimelockBefore = AtomicSwapExchangeWrapper.get_refund_timelock(hashlock)
+        timeBefore = time.time()
+        AtomicSwapExchangeWrapper.set_buyer_address(hashlock, buyerAddress, sender=alice)
+        refundTimelockAfter = AtomicSwapExchangeWrapper.get_refund_timelock(hashlock)
+        self.assertEqual(refundTimelockBefore, 0)
+        self.assertTrue(refundTimelockAfter > timeBefore and refundTimelockAfter < timeBefore + 200)
+
     def test_claim_correct_hashlock(self):
         secret = randomSecret()
         hashlock = getHashlock(secret)
