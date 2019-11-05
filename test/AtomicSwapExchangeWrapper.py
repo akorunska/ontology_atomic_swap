@@ -92,7 +92,7 @@ def set_buyer_address(hashlock, buyer, sender):
     responce = SdkUtils.SendTransaction(contract_address, sender, sender, gas_limit, gas_price, abiFunction, preExec)
     return responce
 
-def refund(hashlock, sender=alice):
+def refund(hashlock, sender):
     preExec = False
     params = dict()
     params["order_id"] = "Hex:" + hashlock.hex()
@@ -100,7 +100,7 @@ def refund(hashlock, sender=alice):
     responce = SdkUtils.SendTransaction(contract_address, sender, sender, gas_limit, gas_price, abiFunction, preExec)
     return responce
 
-def claim(hashlock, secret, sender=alice):
+def claim(hashlock, secret, sender):
     preExec = False
     params = dict()
     params["order_id"] = "Hex:" + hashlock.hex()

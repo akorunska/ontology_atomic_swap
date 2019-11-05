@@ -33,7 +33,7 @@ def getHashlock(secret):
     return m.digest()
 
 
-class TestCompiler(unittest.TestCase):
+class TestAtomicSwapExchange(unittest.TestCase):
     def test_initiate_order_new_hashlock(self):
         hashlock = randomSecret()
         amountOfOntToSell = 100
@@ -231,8 +231,21 @@ class TestCompiler(unittest.TestCase):
         SdkUtils.WaitNextBlock()
         buyerAddress = bobAddress
         AtomicSwapExchangeWrapper.set_buyer_address(hashlock, buyerAddress, sender=alice)
+        SdkUtils.WaitNextBlock()
         time.sleep(refundTimelockDuration)
-        txHash = AtomicSwapExchangeWrapper.refund(hashlock, secret, sender=alice)
+        txHash = AtomicSwapExchangeWrapper.refund(hashlock, sender=alice)
+        self.assertTrue(len(txHash))
+
+    def test_refund_for_initiator_buyer_not_set(self):
+        secret = randomSecret()
+        hashlock = getHashlock(secret)
+        amountOfOntToSell = 100
+        amountOfEthToBuy = 2
+
+        AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
+        SdkUtils.WaitNextBlock()
+        buyerAddress = bobAddress
+        txHash = AtomicSwapExchangeWrapper.refund(hashlock, sender=alice)
         self.assertTrue(len(txHash))
 
     def test_refund_for_initiator_before_locktime(self):
@@ -246,7 +259,7 @@ class TestCompiler(unittest.TestCase):
         buyerAddress = bobAddress
         AtomicSwapExchangeWrapper.set_buyer_address(hashlock, buyerAddress, sender=alice)
         with self.assertRaises(Exception):
-            AtomicSwapExchangeWrapper.refund(hashlock, secret, sender=alice)
+            AtomicSwapExchangeWrapper.refund(hashlock, sender=alice)
     
     def test_refund_for_buyer(self):
         secret = randomSecret()
@@ -260,7 +273,7 @@ class TestCompiler(unittest.TestCase):
         AtomicSwapExchangeWrapper.set_buyer_address(hashlock, buyerAddress, sender=alice)
         time.sleep(refundTimelockDuration)
         with self.assertRaises(Exception):
-            AtomicSwapExchangeWrapper.refund(hashlock, secret, sender=bob)
+            AtomicSwapExchangeWrapper.refund(hashlock, sender=bob)
 
     def test_refund_for_random_user(self):
         secret = randomSecret()
@@ -274,7 +287,7 @@ class TestCompiler(unittest.TestCase):
         AtomicSwapExchangeWrapper.set_buyer_address(hashlock, buyerAddress, sender=alice)
         time.sleep(refundTimelockDuration)
         with self.assertRaises(Exception):
-            AtomicSwapExchangeWrapper.refund(hashlock, secret, sender=eve)
+            AtomicSwapExchangeWrapper.refund(hashlock, sender=eve)
 
 if __name__ == '__main__':
     unittest.main()

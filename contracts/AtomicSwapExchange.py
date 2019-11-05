@@ -92,8 +92,15 @@ def get_refund_timelock(order_id):
     timelock = Get(context, ConcatKey(order_id, REFUND_TIMELOCK))
     return timelock if timelock is not None else 0
 
-def refund(hashlock):
-    pass
+def refund(order_id):
+    saved_initiator = Get(context, ConcatKey(order_id, INITIATOR))
+    WitnessRequire(saved_initiator)
+
+    timelock = Get(context, ConcatKey(order_id, REFUND_TIMELOCK))
+    if timelock is None:
+        timelock = 0
+    Require(GetTime() >= timelock)
+     # todo add sending ont according amount of ont in the order
     
 def claim(order_id, secret):
     claimed = Get(context, ConcatKey(order_id, CLAIMED))
