@@ -35,7 +35,7 @@ def get_amount_of_ont_to_sell(hashlock):
     params["order_id"] = "Hex:" + hashlock.hex()
 
     abiFunction = Invoke.get_function(params, 'get_amount_of_ont_to_sell', abi_info)
-    responce = SdkUtils.SendTransaction(contract_address, alice, payer, gas_limit, gas_price, abiFunction, preExec)
+    responce = SdkUtils.SendTransaction(contract_address, payer, payer, gas_limit, gas_price, abiFunction, preExec)
     return parse_neo_vm_contract_return_type_integer(responce)
     
 def get_amount_of_eth_to_buy(hashlock):
@@ -44,7 +44,7 @@ def get_amount_of_eth_to_buy(hashlock):
     params["order_id"] = "Hex:" + hashlock.hex()
 
     abiFunction = Invoke.get_function(params, 'get_amount_of_eth_to_buy', abi_info)
-    responce = SdkUtils.SendTransaction(contract_address, alice, payer, gas_limit, gas_price, abiFunction, preExec)
+    responce = SdkUtils.SendTransaction(contract_address, payer, payer, gas_limit, gas_price, abiFunction, preExec)
     return parse_neo_vm_contract_return_type_integer(responce)
 
 def get_hashlock(hashlock):
@@ -53,7 +53,7 @@ def get_hashlock(hashlock):
     params["order_id"] = "Hex:" + hashlock.hex()
 
     abiFunction = Invoke.get_function(params, 'get_hashlock', abi_info)
-    responce = SdkUtils.SendTransaction(contract_address, alice, payer, gas_limit, gas_price, abiFunction, preExec)
+    responce = SdkUtils.SendTransaction(contract_address, payer, payer, gas_limit, gas_price, abiFunction, preExec)
     return bytes(parse_neo_vm_contract_return_type_string(responce), 'utf-8')
 
 def get_initiator(hashlock):
@@ -62,7 +62,7 @@ def get_initiator(hashlock):
     params["order_id"] = "Hex:" + hashlock.hex()
 
     abiFunction = Invoke.get_function(params, 'get_initiator', abi_info)
-    responce = SdkUtils.SendTransaction(contract_address, alice, payer, gas_limit, gas_price, abiFunction, preExec)
+    responce = SdkUtils.SendTransaction(contract_address, payer, payer, gas_limit, gas_price, abiFunction, preExec)
     return responce
 
 def get_buyer(hashlock):
@@ -71,7 +71,7 @@ def get_buyer(hashlock):
     params["order_id"] = "Hex:" + hashlock.hex()
 
     abiFunction = Invoke.get_function(params, 'get_buyer', abi_info)
-    responce = SdkUtils.SendTransaction(contract_address, alice, payer, gas_limit, gas_price, abiFunction, preExec)
+    responce = SdkUtils.SendTransaction(contract_address, payer, payer, gas_limit, gas_price, abiFunction, preExec)
     return responce
 
 def get_refund_timelock(hashlock):
@@ -80,7 +80,7 @@ def get_refund_timelock(hashlock):
     params["order_id"] = "Hex:" + hashlock.hex()
 
     abiFunction = Invoke.get_function(params, 'get_refund_timelock', abi_info)
-    responce = SdkUtils.SendTransaction(contract_address, alice, payer, gas_limit, gas_price, abiFunction, preExec)
+    responce = SdkUtils.SendTransaction(contract_address, payer, payer, gas_limit, gas_price, abiFunction, preExec)
     return parse_neo_vm_contract_return_type_integer(responce)
 
 def set_buyer_address(hashlock, buyer, sender):
@@ -109,4 +109,10 @@ def claim(hashlock, secret, sender):
     responce = SdkUtils.SendTransaction(contract_address, sender, sender, gas_limit, gas_price, abiFunction, preExec)
     return responce
 
+def get_ont_balance():
+    preExec = True
+    params = dict()
 
+    abiFunction = Invoke.get_function(params, 'get_ont_balance', abi_info)
+    responce = SdkUtils.SendTransaction(contract_address, payer, payer, gas_limit, gas_price, abiFunction, preExec)
+    return parse_neo_vm_contract_return_type_integer(responce)

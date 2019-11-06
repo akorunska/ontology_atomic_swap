@@ -6,6 +6,8 @@ from boa.interop.System.Runtime import  GetTime
 
 context = GetContext()
 
+ONT_ADDRESS = bytearray(b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01')
+
 HASH = 'Hash'
 ONT_TO_SELL =  'OntToSell'
 ETH_TO_BUY = 'EthToBuy'
@@ -52,6 +54,8 @@ def Main(operation, args):
         hashlock = args[0]
         secret = args[1]
         return claim(hashlock, secret)
+    if operation == "get_ont_balance":
+        return get_ont_balance()
 
 
 def intiate_order(ont_to_sell, eth_to_buy, hashlock, initiator):
@@ -64,6 +68,8 @@ def intiate_order(ont_to_sell, eth_to_buy, hashlock, initiator):
     Put(context, ConcatKey(order_id, ONT_TO_SELL), ont_to_sell)
     Put(context, ConcatKey(order_id, INITIATOR), initiator)
     Put(context, ConcatKey(order_id, CLAIMED), False)
+
+    transfer_ont(initiator, GetExecutingScriptHash(), ont_to_sell)
 
 def get_amount_of_ont_to_sell(order_id):
     return Get(context, ConcatKey(order_id, ONT_TO_SELL))
@@ -100,7 +106,8 @@ def refund(order_id):
     if timelock is None:
         timelock = 0
     Require(GetTime() >= timelock)
-     # todo add sending ont according amount of ont in the order
+    ont_to_sell = Get(context, ConcatKey(order_id, ONT_TO_SELL))
+    transfer_ont(GetExecutingScriptHash(), saved_initiator, ont_to_sell)
     
 def claim(order_id, secret):
     claimed = Get(context, ConcatKey(order_id, CLAIMED))
@@ -115,7 +122,17 @@ def claim(order_id, secret):
     WitnessRequire(saved_buyer)
 
     Put(context, ConcatKey(order_id, CLAIMED), True)
-    # todo add sending ont according amount of ont in the order
+    ont_to_sell = Get(context, ConcatKey(order_id, ONT_TO_SELL))
+    transfer_ont(GetExecutingScriptHash(), saved_buyer, ont_to_sell)
+
+def transfer_ont(fromAcct, toAcct, amount):
+    param = state(fromAcct, toAcct, amount)
+    res = Invoke(0, ONT_ADDRESS, 'transfer', [param])
+    return res
+
+def get_ont_balance():
+    param = GetExecutingScriptHash()
+    return Invoke(0, ONT_ADDRESS, 'balanceOf', param)
 
     
     
