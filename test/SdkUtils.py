@@ -53,14 +53,12 @@ def ContractEvents(tx):
 def AssignFuncsToRole(identity, password, keyNo, contractAddress, role, functionsList, adminAcct):
     res = g_auth.assign_funcs_to_role(identity, password, keyNo, contractAddress, role, functionsList, adminAcct, g_gasLimit, g_gasPrice)
     WaitNextBlock()
-    print (sdk.rpc.get_smart_contract_event_by_tx_hash(res))
     return res
 
 
 def AssignOntIdsToRole(identity, password, keyNo, contractAddress, role, ontIdsList, adminAcct):
     res = g_auth.assign_ont_ids_to_role(identity, password, keyNo, contractAddress, role, ontIdsList, adminAcct, g_gasLimit, g_gasPrice)
     # WaitNextBlock()
-    # print (sdk.rpc.get_smart_contract_event_by_tx_hash(res))
     return res
 
 
