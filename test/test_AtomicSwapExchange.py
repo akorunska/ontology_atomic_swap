@@ -52,9 +52,16 @@ class TestAtomicSwapExchange(unittest.TestCase):
         amountOfEthToBuy = 2
         with self.assertRaises(Exception):
             AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock, initiator=bobAddress)
+        
+        # mentioned initiator can still create order
+        try:
+            AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSell, amountOfEthToBuy, hashlock)
+        except Exception as e:
+            self.fail(e)
 
     def test_initiate_order_existing_hashlock(self):
-        hashlock = randomSecret()
+        secret = randomSecret()
+        hashlock = getHashlock(secret)
         amountOfOntToSellInitial = 100
         amountOfEthToBuyInitial = 2
         AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSellInitial, amountOfEthToBuyInitial, hashlock)
@@ -63,6 +70,15 @@ class TestAtomicSwapExchange(unittest.TestCase):
         amountOfEthToBuyUpdated = 3
         with self.assertRaises(Exception):
             AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSellUpdated, amountOfEthToBuyUpdated, hashlock)
+        
+        # initiating order with non-repeated secret is still possible
+        secret = randomSecret()
+        newHashlock = getHashlock(secret)
+        print(hashlock, newHashlock)
+        try:
+            AtomicSwapExchangeWrapper.initiate_order(amountOfOntToSellInitial, amountOfEthToBuyInitial, newHashlock)
+        except Exception as e:
+            self.fail(e)
 
     def test_initiate_order_data_is_saved(self):
         hashlock = randomSecret()
@@ -132,6 +148,12 @@ class TestAtomicSwapExchange(unittest.TestCase):
         savedBuyer = savedAddress.b58encode()
         self.assertNotEqual(savedBuyer, buyerAddress)
 
+        # alice still can set buyer address
+        AtomicSwapExchangeWrapper.set_buyer_address(hashlock, buyer=buyerAddress, sender=alice)
+        savedAddress = Address(bytes.fromhex(AtomicSwapExchangeWrapper.get_buyer(hashlock)))
+        savedBuyer = savedAddress.b58encode()
+        self.assertEqual(savedBuyer, buyerAddress)
+
     def test_set_buyer_address_as_random_user(self):
         secret = randomSecret()
         hashlock = getHashlock(secret)
@@ -146,6 +168,12 @@ class TestAtomicSwapExchange(unittest.TestCase):
         savedAddress = Address(bytes.fromhex(AtomicSwapExchangeWrapper.get_buyer(hashlock)))
         savedBuyer = savedAddress.b58encode()
         self.assertNotEqual(savedBuyer, buyerAddress)
+
+        # alice still can set buyer address
+        AtomicSwapExchangeWrapper.set_buyer_address(hashlock, buyerAddress, sender=alice)
+        savedAddress = Address(bytes.fromhex(AtomicSwapExchangeWrapper.get_buyer(hashlock)))
+        savedBuyer = savedAddress.b58encode()
+        self.assertEqual(savedBuyer, buyerAddress)
 
     def test_set_buyer_address_refund_timelock_is_set(self):
         secret = randomSecret()
@@ -213,7 +241,8 @@ class TestAtomicSwapExchange(unittest.TestCase):
 
     def test_claim_wrong_secret(self):
         secret = randomSecret()
-        hashlock = getHashlock(getHashlock(secret)) + b"blah"
+        hashlock = getHashlock(secret)
+        wrongSecret = secret + b"blah"
         amountOfOntToSell = 100
         amountOfEthToBuy = 2
 
@@ -226,16 +255,20 @@ class TestAtomicSwapExchange(unittest.TestCase):
         contractBalanceBefore = AtomicSwapExchangeWrapper.get_ont_balance()
 
         with self.assertRaises(Exception):
-            AtomicSwapExchangeWrapper.claim(hashlock, secret, sender=bob)
+            AtomicSwapExchangeWrapper.claim(hashlock, wrongSecret, sender=bob)
 
         buyerBalanceAfter = getONTBalance(buyerAddress)
         contractBalanceAfter = AtomicSwapExchangeWrapper.get_ont_balance()
         self.assertEqual(buyerBalanceAfter, buyerBalanceBefore)
         self.assertEqual(contractBalanceAfter, contractBalanceBefore)
 
+        # claim with correct hashlock is not failing
+        txHash = AtomicSwapExchangeWrapper.claim(hashlock, secret, sender=bob)
+        self.assertTrue(len(txHash))
+
     def test_claim_buyer_not_set(self):
         secret = randomSecret()
-        hashlock = getHashlock(getHashlock(secret))
+        hashlock = getHashlock(secret)
         amountOfOntToSell = 100
         amountOfEthToBuy = 2
 
@@ -261,9 +294,18 @@ class TestAtomicSwapExchange(unittest.TestCase):
         self.assertEqual(eveBalanceAfter, eveBalanceBefore)
         self.assertEqual(contractBalanceAfter, contractBalanceBefore)
 
-    def test_claim_wrong_buyer_address(self):
+        # after setting buyer's address buyer can claim ont
+        buyerAddress = bobAddress
+        AtomicSwapExchangeWrapper.set_buyer_address(hashlock, buyerAddress, sender=alice)
+
+        try:
+            AtomicSwapExchangeWrapper.claim(hashlock, secret, sender=bob)
+        except Exception as e:
+            self.fail(e)
+
+    def test_claim_wrong_buyer_address(self): 
         secret = randomSecret()
-        hashlock = getHashlock(getHashlock(secret)) + b"blah"
+        hashlock = getHashlock(secret)
         amountOfOntToSell = 100
         amountOfEthToBuy = 2
 
@@ -272,7 +314,7 @@ class TestAtomicSwapExchange(unittest.TestCase):
         buyerAddress = bobAddress
         AtomicSwapExchangeWrapper.set_buyer_address(hashlock, buyerAddress, sender=alice)
 
-        initiatorBalanceBefore = getONTBalance(buyerAddress)
+        initiatorBalanceBefore = getONTBalance(aliceAddress)
         eveBalanceBefore = getONTBalance(eveAddress)
         contractBalanceBefore = AtomicSwapExchangeWrapper.get_ont_balance()
 
@@ -283,13 +325,27 @@ class TestAtomicSwapExchange(unittest.TestCase):
             # a random user cannot claim coins
             AtomicSwapExchangeWrapper.claim(hashlock, secret, sender=eve)
         
-        initiatorBalanceAfter = getONTBalance(buyerAddress)
+        initiatorBalanceAfter = getONTBalance(aliceAddress)
         eveBalanceAfter = getONTBalance(eveAddress)
         contractBalanceAfter = AtomicSwapExchangeWrapper.get_ont_balance()
 
         self.assertEqual(initiatorBalanceAfter, initiatorBalanceBefore)
         self.assertEqual(eveBalanceAfter, eveBalanceBefore)
         self.assertEqual(contractBalanceAfter, contractBalanceBefore)
+
+        # the buyer can claim coins anyway
+        try:
+            buyerBalanceBefore = getONTBalance(buyerAddress)
+
+            txHash = AtomicSwapExchangeWrapper.claim(hashlock, secret, sender=bob)
+            self.assertTrue(len(txHash))
+
+            buyerBalanceAfter = getONTBalance(buyerAddress)
+            contractBalanceAfter = AtomicSwapExchangeWrapper.get_ont_balance()
+            self.assertEqual(buyerBalanceAfter, buyerBalanceBefore + amountOfOntToSell)
+            self.assertEqual(contractBalanceAfter, contractBalanceBefore - amountOfOntToSell)
+        except Exception as e:
+            self.fail(e)
 
     def test_refund_for_initiator_after_locktime(self):
         secret = randomSecret()
@@ -359,6 +415,13 @@ class TestAtomicSwapExchange(unittest.TestCase):
         contractBalanceAfter = AtomicSwapExchangeWrapper.get_ont_balance()
         self.assertEqual(initiatorBalanceAfter, initiatorBalanceBefore)
         self.assertEqual(contractBalanceAfter, contractBalanceBefore)
+
+        # after locktime expires initiator can refund ont
+        time.sleep(refundTimelockDuration)
+        try:
+            AtomicSwapExchangeWrapper.refund(hashlock, sender=alice)
+        except Exception as e:
+            self.fail(e)
     
     def test_refund_for_buyer(self):
         secret = randomSecret()
@@ -383,6 +446,12 @@ class TestAtomicSwapExchange(unittest.TestCase):
         self.assertEqual(userBalanceAfter, userBalanceBefore)
         self.assertEqual(contractBalanceAfter, contractBalanceBefore)
 
+        # after that initiator can refund ont
+        try:
+            AtomicSwapExchangeWrapper.refund(hashlock, sender=alice)
+        except Exception as e:
+            self.fail(e)
+
     def test_refund_for_random_user(self):
         secret = randomSecret()
         hashlock = getHashlock(secret)
@@ -405,6 +474,12 @@ class TestAtomicSwapExchange(unittest.TestCase):
         contractBalanceBefore = AtomicSwapExchangeWrapper.get_ont_balance()
         self.assertEqual(userBalanceAfter, userBalanceBefore)
         self.assertEqual(contractBalanceAfter, contractBalanceBefore)
+
+        # after that initiator can refund ont
+        try:
+            AtomicSwapExchangeWrapper.refund(hashlock, sender=alice)
+        except Exception as e:
+            self.fail(e)
 
 if __name__ == '__main__':
     unittest.main()

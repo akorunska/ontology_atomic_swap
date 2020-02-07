@@ -7,7 +7,7 @@ sdk = SdkWrapper.GetInstance().GetSdk()
 g_auth = sdk.native_vm().auth()
 
 g_gasLimit = 510000
-g_gasPrice = 0
+g_gasPrice = 500
 
 def WaitNextBlock():
     currentBlock = sdk.rpc.get_block_count()
